@@ -246,13 +246,15 @@
                 minutes: time.minutes
             };
 
-            // Send data and wait for confirmation before closing
-            tg.sendData(JSON.stringify(data));
-            
             // Show loading state
             const setButton = document.querySelector('.set-button');
             setButton.textContent = 'Setting...';
             setButton.disabled = true;
+
+            // Send data
+            tg.MainButton.setText('Setting reminder...');
+            tg.MainButton.show();
+            tg.sendData(JSON.stringify(data));
         }
 
         function switchTab(tabName) {
@@ -285,12 +287,27 @@
             setTimeout(loadActiveSubscriptions, 500);
         }
 
-        // Remove the viewportChanged event and add proper data handling
-        tg.onEvent('message', function(message) {
-            if (message && message.reminders) {
-                updateSubscriptionsList(message.reminders);
-            } else if (message && message.success) {
-                tg.close();
+        // Update the event handler
+        tg.onEvent('message', function(event) {
+            try {
+                const message = JSON.parse(event.data);
+                console.log('Received message:', message);
+                
+                if (message.reminders) {
+                    updateSubscriptionsList(message.reminders);
+                } else if (message.success) {
+                    // Wait a bit before closing to show success
+                    setTimeout(() => {
+                        tg.close();
+                    }, 1000);
+                } else if (message.error) {
+                    tg.showAlert(message.error);
+                    const setButton = document.querySelector('.set-button');
+                    setButton.textContent = 'Set Timer';
+                    setButton.disabled = false;
+                }
+            } catch (e) {
+                console.error('Error parsing message:', e);
             }
         });
 
