@@ -156,76 +156,180 @@
             font-size: 14px;
             color: #8e8e93;
         }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #2c3847;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            color: #8e8e93;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--tg-theme-button-color);
+        }
+
+        .tab.active:after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--tg-theme-button-color);
+        }
+
+        .panel {
+            display: none;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        .reminder-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .reminder-item {
+            background-color: #2c3847;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .reminder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .reminder-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .reminder-time {
+            font-size: 14px;
+            color: #8e8e93;
+        }
+
+        .reminder-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .reminder-button {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--tg-theme-button-color);
+            background: none;
+            color: var(--tg-theme-button-color);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .reminder-button.delete {
+            border-color: #ff3b30;
+            color: #ff3b30;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #8e8e93;
+            padding: 32px 16px;
+        }
     </style>
 </head>
 <body>
-    <div class="main-content">
-        <input type="text" class="subscription-input" id="subscription-name" placeholder="Enter subscription name">
-        
-        <div class="time-input">
-            <div class="time-row">
-                <div class="time-label">Days</div>
-                <div class="time-controls">
-                    <button class="time-button" 
-                        onmousedown="startDecrease('days')" 
-                        onmouseup="stopAdjust()"
-                        onmouseleave="stopAdjust()"
-                        ontouchstart="startDecrease('days')" 
-                        ontouchend="stopAdjust()">-</button>
-                    <div class="time-value" id="days-value">0</div>
-                    <button class="time-button" 
-                        onmousedown="startIncrease('days')" 
-                        onmouseup="stopAdjust()"
-                        onmouseleave="stopAdjust()"
-                        ontouchstart="startIncrease('days')" 
-                        ontouchend="stopAdjust()">+</button>
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('new')">New Reminder</div>
+        <div class="tab" onclick="switchTab('list')">Active Reminders</div>
+    </div>
+
+    <div class="panel active" id="new-panel">
+        <div class="main-content">
+            <input type="text" class="subscription-input" id="subscription-name" placeholder="Enter subscription name">
+            
+            <div class="time-input">
+                <div class="time-row">
+                    <div class="time-label">Days</div>
+                    <div class="time-controls">
+                        <button class="time-button" 
+                            onmousedown="startDecrease('days')" 
+                            onmouseup="stopAdjust()"
+                            onmouseleave="stopAdjust()"
+                            ontouchstart="startDecrease('days')" 
+                            ontouchend="stopAdjust()">-</button>
+                        <div class="time-value" id="days-value">0</div>
+                        <button class="time-button" 
+                            onmousedown="startIncrease('days')" 
+                            onmouseup="stopAdjust()"
+                            onmouseleave="stopAdjust()"
+                            ontouchstart="startIncrease('days')" 
+                            ontouchend="stopAdjust()">+</button>
+                    </div>
                 </div>
-            </div>
-            <div class="time-row">
-                <div class="time-label">Hours</div>
-                <div class="time-controls">
-                    <button class="time-button" 
-                        onmousedown="startDecrease('hours')" 
-                        onmouseup="stopAdjust()"
-                        onmouseleave="stopAdjust()"
-                        ontouchstart="startDecrease('hours')" 
-                        ontouchend="stopAdjust()">-</button>
-                    <div class="time-value" id="hours-value">0</div>
-                    <button class="time-button" 
-                        onmousedown="startIncrease('hours')" 
-                        onmouseup="stopAdjust()"
-                        onmouseleave="stopAdjust()"
-                        ontouchstart="startIncrease('hours')" 
-                        ontouchend="stopAdjust()">+</button>
+                <div class="time-row">
+                    <div class="time-label">Hours</div>
+                    <div class="time-controls">
+                        <button class="time-button" 
+                            onmousedown="startDecrease('hours')" 
+                            onmouseup="stopAdjust()"
+                            onmouseleave="stopAdjust()"
+                            ontouchstart="startDecrease('hours')" 
+                            ontouchend="stopAdjust()">-</button>
+                        <div class="time-value" id="hours-value">0</div>
+                        <button class="time-button" 
+                            onmousedown="startIncrease('hours')" 
+                            onmouseup="stopAdjust()"
+                            onmouseleave="stopAdjust()"
+                            ontouchstart="startIncrease('hours')" 
+                            ontouchend="stopAdjust()">+</button>
+                    </div>
                 </div>
-            </div>
-            <div class="time-row">
-                <div class="time-label">Minutes</div>
-                <div class="time-controls">
-                    <button class="time-button" 
-                        onmousedown="startDecrease('minutes')" 
-                        onmouseup="stopAdjust()"
-                        onmouseleave="stopAdjust()"
-                        ontouchstart="startDecrease('minutes')" 
-                        ontouchend="stopAdjust()">-</button>
-                    <div class="time-value" id="minutes-value">0</div>
-                    <button class="time-button" 
-                        onmousedown="startIncrease('minutes')" 
-                        onmouseup="stopAdjust()"
-                        onmouseleave="stopAdjust()"
-                        ontouchstart="startIncrease('minutes')" 
-                        ontouchend="stopAdjust()">+</button>
+                <div class="time-row">
+                    <div class="time-label">Minutes</div>
+                    <div class="time-controls">
+                        <button class="time-button" 
+                            onmousedown="startDecrease('minutes')" 
+                            onmouseup="stopAdjust()"
+                            onmouseleave="stopAdjust()"
+                            ontouchstart="startDecrease('minutes')" 
+                            ontouchend="stopAdjust()">-</button>
+                        <div class="time-value" id="minutes-value">0</div>
+                        <button class="time-button" 
+                            onmousedown="startIncrease('minutes')" 
+                            onmouseup="stopAdjust()"
+                            onmouseleave="stopAdjust()"
+                            ontouchstart="startIncrease('minutes')" 
+                            ontouchend="stopAdjust()">+</button>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div class="button-container">
+            <button class="set-button" onclick="setSubscription()">Set Reminder</button>
+        </div>
     </div>
 
-    <div class="button-container">
-        <button class="set-button" onclick="setSubscription()">Set Reminder</button>
-    </div>
-
-    <div class="subscriptions-list" id="subscriptions-list">
-        <!-- Active subscriptions will be listed here -->
+    <div class="panel" id="list-panel">
+        <div class="reminder-list" id="reminder-list">
+            <!-- Reminders will be populated here -->
+        </div>
     </div>
 
     <script>
@@ -302,6 +406,85 @@
         document.querySelectorAll('.time-button').forEach(button => {
             button.addEventListener('touchstart', (e) => e.preventDefault());
         });
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.toggle('active', t.textContent.toLowerCase().includes(tab));
+            });
+            document.querySelectorAll('.panel').forEach(p => {
+                p.classList.toggle('active', p.id === `${tab}-panel`);
+            });
+            if (tab === 'list') {
+                loadReminders();
+            }
+        }
+
+        function loadReminders() {
+            const data = {
+                action: 'get_reminders'
+            };
+            tg.sendData(JSON.stringify(data));
+        }
+
+        function updateReminderList(reminders) {
+            const list = document.getElementById('reminder-list');
+            if (!reminders || Object.keys(reminders).length === 0) {
+                list.innerHTML = '<div class="empty-state">No active reminders</div>';
+                return;
+            }
+
+            list.innerHTML = '';
+            for (const [id, reminder] of Object.entries(reminders)) {
+                const targetTime = new Date(reminder.target_time);
+                const timeLeft = getTimeLeft(targetTime);
+                
+                const item = document.createElement('div');
+                item.className = 'reminder-item';
+                item.innerHTML = `
+                    <div class="reminder-header">
+                        <div class="reminder-name">${reminder.message}</div>
+                        <div class="reminder-time">${timeLeft}</div>
+                    </div>
+                    <div class="reminder-actions">
+                        <button class="reminder-button" onclick="editReminder('${id}')">Edit</button>
+                        <button class="reminder-button delete" onclick="deleteReminder('${id}')">Delete</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            }
+        }
+
+        function getTimeLeft(targetTime) {
+            const now = new Date();
+            const diff = targetTime - now;
+            if (diff <= 0) return 'Time expired';
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+            const parts = [];
+            if (days > 0) parts.push(`${days}d`);
+            if (hours > 0) parts.push(`${hours}h`);
+            if (minutes > 0) parts.push(`${minutes}m`);
+            return parts.join(' ') || 'Less than 1m';
+        }
+
+        function editReminder(id) {
+            const data = {
+                action: 'edit_reminder',
+                id: id
+            };
+            tg.sendData(JSON.stringify(data));
+        }
+
+        function deleteReminder(id) {
+            const data = {
+                action: 'delete_reminder',
+                id: id
+            };
+            tg.sendData(JSON.stringify(data));
+        }
 
         // Initialize
         tg.ready();
