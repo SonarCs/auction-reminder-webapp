@@ -5,39 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --tg-theme-bg-color: #18222d;
-            --tg-theme-button-color: #2ea6ff;
-            --tg-theme-button-text-color: #ffffff;
-            --tg-theme-text-color: #ffffff;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
         body {
-            background-color: var(--tg-theme-bg-color);
-            color: var(--tg-theme-text-color);
+            background-color: #18222d;
+            color: #ffffff;
             padding: 16px;
-            max-width: 400px;
-            margin: 0 auto;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .subscription-input {
+            width: 100%;
+            background-color: #2c3847;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        .subscription-input::placeholder {
+            color: #8e8e93;
         }
 
         .time-input {
             background-color: #2c3847;
             border-radius: 10px;
             padding: 8px;
-            margin-bottom: 8px;
         }
 
         .time-row {
@@ -70,120 +64,46 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            touch-action: manipulation;
-        }
-
-        .time-button:active {
-            background-color: #151d26;
         }
 
         .time-value {
             min-width: 30px;
             text-align: center;
             font-size: 17px;
-            font-weight: 500;
-            color: #fff;
         }
 
         .set-button {
             width: 100%;
             padding: 12px;
-            background-color: var(--tg-theme-button-color);
-            color: var(--tg-theme-button-text-color);
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            margin-top: 8px;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .set-button:active {
-            opacity: 0.8;
-        }
-
-        .subscription-input {
-            width: 100%;
-            background-color: #2c3847;
-            border: none;
-            border-radius: 10px;
-            padding: 12px;
+            background-color: #2ea6ff;
             color: #fff;
-            font-size: 16px;
-            margin-bottom: 16px;
-            -webkit-user-select: text;
-            user-select: text;
-        }
-
-        .subscription-input::placeholder {
-            color: #8e8e93;
-        }
-
-        .subscription-input:focus {
-            outline: none;
-        }
-
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .button-container {
-            margin-top: auto;
-            padding-bottom: 16px;
-        }
-
-        .subscriptions-list {
-            margin-top: 20px;
-        }
-
-        .subscription-item {
-            background-color: #2c3847;
+            border: none;
             border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 8px;
-        }
-
-        .subscription-name {
             font-size: 16px;
-            margin-bottom: 4px;
-        }
-
-        .subscription-time {
-            font-size: 14px;
-            color: #8e8e93;
+            margin-top: 16px;
+            cursor: pointer;
         }
 
         .tabs {
             display: flex;
             margin-bottom: 16px;
-            border-bottom: 1px solid #2c3847;
+            background-color: #2c3847;
+            border-radius: 10px;
+            padding: 4px;
         }
 
         .tab {
             flex: 1;
-            padding: 12px;
+            padding: 8px;
             text-align: center;
             color: #8e8e93;
             cursor: pointer;
-            position: relative;
+            border-radius: 8px;
         }
 
         .tab.active {
-            color: var(--tg-theme-button-color);
-        }
-
-        .tab.active:after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background-color: var(--tg-theme-button-color);
+            background-color: #1c2733;
+            color: #fff;
         }
 
         .panel {
@@ -194,59 +114,51 @@
             display: block;
         }
 
-        .reminder-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .reminder-item {
+        .subscription-card {
             background-color: #2c3847;
             border-radius: 10px;
             padding: 16px;
+            margin-bottom: 12px;
         }
 
-        .reminder-header {
+        .subscription-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
             margin-bottom: 8px;
         }
 
-        .reminder-name {
+        .subscription-name {
             font-size: 16px;
             font-weight: 500;
-            color: #fff;
         }
 
-        .reminder-time {
-            font-size: 14px;
+        .subscription-time {
             color: #8e8e93;
+            font-size: 14px;
         }
 
-        .reminder-actions {
+        .subscription-actions {
             display: flex;
             gap: 8px;
-            margin-top: 12px;
         }
 
-        .reminder-button {
+        .action-button {
             flex: 1;
             padding: 8px;
             border-radius: 8px;
-            border: 1px solid var(--tg-theme-button-color);
+            border: 1px solid #2ea6ff;
             background: none;
-            color: var(--tg-theme-button-color);
+            color: #2ea6ff;
             font-size: 14px;
             cursor: pointer;
         }
 
-        .reminder-button.delete {
+        .action-button.delete {
             border-color: #ff3b30;
             color: #ff3b30;
         }
 
-        .empty-state {
+        .empty-message {
             text-align: center;
             color: #8e8e93;
             padding: 32px 16px;
@@ -255,80 +167,46 @@
 </head>
 <body>
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('new')">New Reminder</div>
-        <div class="tab" onclick="switchTab('list')">Active Reminders</div>
+        <div class="tab active" onclick="switchTab('new')">New Timer</div>
+        <div class="tab" onclick="switchTab('active')">Active Timers</div>
     </div>
 
     <div class="panel active" id="new-panel">
-        <div class="main-content">
-            <input type="text" class="subscription-input" id="subscription-name" placeholder="Enter subscription name">
-            
-            <div class="time-input">
-                <div class="time-row">
-                    <div class="time-label">Days</div>
-                    <div class="time-controls">
-                        <button class="time-button" 
-                            onmousedown="startDecrease('days')" 
-                            onmouseup="stopAdjust()"
-                            onmouseleave="stopAdjust()"
-                            ontouchstart="startDecrease('days')" 
-                            ontouchend="stopAdjust()">-</button>
-                        <div class="time-value" id="days-value">0</div>
-                        <button class="time-button" 
-                            onmousedown="startIncrease('days')" 
-                            onmouseup="stopAdjust()"
-                            onmouseleave="stopAdjust()"
-                            ontouchstart="startIncrease('days')" 
-                            ontouchend="stopAdjust()">+</button>
-                    </div>
+        <input type="text" class="subscription-input" id="subscription-name" placeholder="Enter subscription name">
+        
+        <div class="time-input">
+            <div class="time-row">
+                <div class="time-label">Days</div>
+                <div class="time-controls">
+                    <button class="time-button" onclick="adjustTime('days', -1)">-</button>
+                    <div class="time-value" id="days-value">0</div>
+                    <button class="time-button" onclick="adjustTime('days', 1)">+</button>
                 </div>
-                <div class="time-row">
-                    <div class="time-label">Hours</div>
-                    <div class="time-controls">
-                        <button class="time-button" 
-                            onmousedown="startDecrease('hours')" 
-                            onmouseup="stopAdjust()"
-                            onmouseleave="stopAdjust()"
-                            ontouchstart="startDecrease('hours')" 
-                            ontouchend="stopAdjust()">-</button>
-                        <div class="time-value" id="hours-value">0</div>
-                        <button class="time-button" 
-                            onmousedown="startIncrease('hours')" 
-                            onmouseup="stopAdjust()"
-                            onmouseleave="stopAdjust()"
-                            ontouchstart="startIncrease('hours')" 
-                            ontouchend="stopAdjust()">+</button>
-                    </div>
+            </div>
+            <div class="time-row">
+                <div class="time-label">Hours</div>
+                <div class="time-controls">
+                    <button class="time-button" onclick="adjustTime('hours', -1)">-</button>
+                    <div class="time-value" id="hours-value">0</div>
+                    <button class="time-button" onclick="adjustTime('hours', 1)">+</button>
                 </div>
-                <div class="time-row">
-                    <div class="time-label">Minutes</div>
-                    <div class="time-controls">
-                        <button class="time-button" 
-                            onmousedown="startDecrease('minutes')" 
-                            onmouseup="stopAdjust()"
-                            onmouseleave="stopAdjust()"
-                            ontouchstart="startDecrease('minutes')" 
-                            ontouchend="stopAdjust()">-</button>
-                        <div class="time-value" id="minutes-value">0</div>
-                        <button class="time-button" 
-                            onmousedown="startIncrease('minutes')" 
-                            onmouseup="stopAdjust()"
-                            onmouseleave="stopAdjust()"
-                            ontouchstart="startIncrease('minutes')" 
-                            ontouchend="stopAdjust()">+</button>
-                    </div>
+            </div>
+            <div class="time-row">
+                <div class="time-label">Minutes</div>
+                <div class="time-controls">
+                    <button class="time-button" onclick="adjustTime('minutes', -1)">-</button>
+                    <div class="time-value" id="minutes-value">0</div>
+                    <button class="time-button" onclick="adjustTime('minutes', 1)">+</button>
                 </div>
             </div>
         </div>
 
-        <div class="button-container">
-            <button class="set-button" onclick="setSubscription()">Set Reminder</button>
-        </div>
+        <button class="set-button" onclick="setSubscription()">Set Timer</button>
     </div>
 
-    <div class="panel" id="list-panel">
-        <div class="reminder-list" id="reminder-list">
-            <!-- Reminders will be populated here -->
+    <div class="panel" id="active-panel">
+        <div id="subscriptions-list">
+            <!-- Active subscriptions will be loaded here -->
         </div>
     </div>
 
@@ -342,39 +220,9 @@
             minutes: 0
         };
 
-        let adjustInterval = null;
-        let adjustDelay = null;
-
         function adjustTime(unit, delta) {
             time[unit] = Math.max(0, time[unit] + delta);
             document.getElementById(`${unit}-value`).textContent = time[unit];
-        }
-
-        function startIncrease(unit) {
-            adjustTime(unit, 1);
-            // Initial delay before rapid increment
-            adjustDelay = setTimeout(() => {
-                adjustInterval = setInterval(() => adjustTime(unit, 1), 100);
-            }, 500);
-        }
-
-        function startDecrease(unit) {
-            adjustTime(unit, -1);
-            // Initial delay before rapid decrement
-            adjustDelay = setTimeout(() => {
-                adjustInterval = setInterval(() => adjustTime(unit, -1), 100);
-            }, 500);
-        }
-
-        function stopAdjust() {
-            if (adjustInterval) {
-                clearInterval(adjustInterval);
-                adjustInterval = null;
-            }
-            if (adjustDelay) {
-                clearTimeout(adjustDelay);
-                adjustDelay = null;
-            }
         }
 
         function setSubscription() {
@@ -402,34 +250,53 @@
             tg.close();
         }
 
-        // Prevent scrolling when touching the buttons
-        document.querySelectorAll('.time-button').forEach(button => {
-            button.addEventListener('touchstart', (e) => e.preventDefault());
-        });
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.toggle('active', tab.textContent.toLowerCase().includes(tabName));
+            });
+            document.querySelectorAll('.panel').forEach(panel => {
+                panel.classList.toggle('active', panel.id === `${tabName}-panel`);
+            });
 
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => {
-                t.classList.toggle('active', t.textContent.toLowerCase().includes(tab));
-            });
-            document.querySelectorAll('.panel').forEach(p => {
-                p.classList.toggle('active', p.id === `${tab}-panel`);
-            });
-            if (tab === 'list') {
-                loadReminders();
+            if (tabName === 'active') {
+                loadActiveSubscriptions();
             }
         }
 
-        function loadReminders() {
+        function loadActiveSubscriptions() {
             const data = {
                 action: 'get_reminders'
             };
             tg.sendData(JSON.stringify(data));
         }
 
-        function updateReminderList(reminders) {
-            const list = document.getElementById('reminder-list');
+        function deleteSubscription(id) {
+            const data = {
+                action: 'delete_reminder',
+                id: id
+            };
+            tg.sendData(JSON.stringify(data));
+            // Reload the list after deletion
+            setTimeout(loadActiveSubscriptions, 500);
+        }
+
+        // Listen for MainButton clicks
+        tg.onEvent('mainButtonClicked', setSubscription);
+
+        // Handle incoming data from the bot
+        window.Telegram.WebApp.onEvent('viewportChanged', function() {
+            if (tg.initDataUnsafe?.query_id) {
+                const data = JSON.parse(tg.initDataUnsafe.query_id);
+                if (data.reminders) {
+                    updateSubscriptionsList(data.reminders);
+                }
+            }
+        });
+
+        function updateSubscriptionsList(reminders) {
+            const list = document.getElementById('subscriptions-list');
             if (!reminders || Object.keys(reminders).length === 0) {
-                list.innerHTML = '<div class="empty-state">No active reminders</div>';
+                list.innerHTML = '<div class="empty-message">No active timers</div>';
                 return;
             }
 
@@ -438,19 +305,18 @@
                 const targetTime = new Date(reminder.target_time);
                 const timeLeft = getTimeLeft(targetTime);
                 
-                const item = document.createElement('div');
-                item.className = 'reminder-item';
-                item.innerHTML = `
-                    <div class="reminder-header">
-                        <div class="reminder-name">${reminder.message}</div>
-                        <div class="reminder-time">${timeLeft}</div>
+                const card = document.createElement('div');
+                card.className = 'subscription-card';
+                card.innerHTML = `
+                    <div class="subscription-header">
+                        <div class="subscription-name">${reminder.message}</div>
+                        <div class="subscription-time">${timeLeft}</div>
                     </div>
-                    <div class="reminder-actions">
-                        <button class="reminder-button" onclick="editReminder('${id}')">Edit</button>
-                        <button class="reminder-button delete" onclick="deleteReminder('${id}')">Delete</button>
+                    <div class="subscription-actions">
+                        <button class="action-button delete" onclick="deleteSubscription('${id}')">Stop Timer</button>
                     </div>
                 `;
-                list.appendChild(item);
+                list.appendChild(card);
             }
         }
 
@@ -468,22 +334,6 @@
             if (hours > 0) parts.push(`${hours}h`);
             if (minutes > 0) parts.push(`${minutes}m`);
             return parts.join(' ') || 'Less than 1m';
-        }
-
-        function editReminder(id) {
-            const data = {
-                action: 'edit_reminder',
-                id: id
-            };
-            tg.sendData(JSON.stringify(data));
-        }
-
-        function deleteReminder(id) {
-            const data = {
-                action: 'delete_reminder',
-                id: id
-            };
-            tg.sendData(JSON.stringify(data));
         }
 
         // Initialize
