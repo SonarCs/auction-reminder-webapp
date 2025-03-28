@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Time Selection</title>
+    <title>Auction Reminder</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -65,6 +65,8 @@
             color: var(--tg-theme-text-color, #000);
             font-size: 16px;
             box-sizing: border-box;
+            resize: vertical;
+            min-height: 100px;
         }
         .message-input:focus {
             outline: none;
@@ -75,35 +77,94 @@
             font-size: 14px;
             margin: 10px 0 5px;
         }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #ccc);
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: var(--tg-theme-hint-color, #666);
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            color: var(--tg-theme-button-color, #0088cc);
+            border-bottom-color: var(--tg-theme-button-color, #0088cc);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .reminder-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .reminder-item {
+            background: var(--tg-theme-bg-color, #f8f9fa);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        .reminder-message {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .reminder-time {
+            color: var(--tg-theme-hint-color, #666);
+            font-size: 14px;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="section-title">Reminder Message</div>
-        <textarea 
-            class="message-input" 
-            id="message" 
-            placeholder="Enter your reminder message here..."
-            rows="3"
-        ></textarea>
-        
-        <div class="section-title">Time Settings</div>
-        <div class="time-selector">
-            <button class="btn" onclick="adjustTime('days', -1)">-</button>
-            <span class="value" id="days">0d</span>
-            <button class="btn" onclick="adjustTime('days', 1)">+</button>
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('new')">New Reminder</div>
+            <div class="tab" onclick="switchTab('list')">Active Reminders</div>
         </div>
-        <div class="time-selector">
-            <button class="btn" onclick="adjustTime('hours', -1)">-</button>
-            <span class="value" id="hours">0h</span>
-            <button class="btn" onclick="adjustTime('hours', 1)">+</button>
+
+        <div id="new-reminder" class="tab-content active">
+            <div class="section-title">Reminder Message</div>
+            <textarea 
+                class="message-input" 
+                id="message" 
+                placeholder="Enter your reminder message here..."
+                rows="3"
+            ></textarea>
+            <div class="error-message" id="message-error">Please enter a reminder message</div>
+            
+            <div class="section-title">Time Settings</div>
+            <div class="time-selector">
+                <button class="btn" onclick="adjustTime('days', -1)">-</button>
+                <span class="value" id="days">0d</span>
+                <button class="btn" onclick="adjustTime('days', 1)">+</button>
+            </div>
+            <div class="time-selector">
+                <button class="btn" onclick="adjustTime('hours', -1)">-</button>
+                <span class="value" id="hours">0h</span>
+                <button class="btn" onclick="adjustTime('hours', 1)">+</button>
+            </div>
+            <div class="time-selector">
+                <button class="btn" onclick="adjustTime('minutes', -1)">-</button>
+                <span class="value" id="minutes">0m</span>
+                <button class="btn" onclick="adjustTime('minutes', 1)">+</button>
+            </div>
+            <button class="btn set-btn" onclick="setReminder()">Set Reminder</button>
         </div>
-        <div class="time-selector">
-            <button class="btn" onclick="adjustTime('minutes', -1)">-</button>
-            <span class="value" id="minutes">0m</span>
-            <button class="btn" onclick="adjustTime('minutes', 1)">+</button>
+
+        <div id="reminder-list" class="tab-content">
+            <div class="reminder-list" id="active-reminders">
+                <!-- Reminders will be populated here -->
+            </div>
         </div>
-        <button class="btn set-btn" onclick="setReminder()">Set Reminder</button>
     </div>
 
     <script>
@@ -115,6 +176,20 @@
             hours: 0,
             minutes: 0
         };
+
+        function switchTab(tab) {
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Activate selected tab
+            document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`${tab === 'new' ? 'new-reminder' : 'reminder-list'}`).classList.add('active');
+            
+            if (tab === 'list') {
+                loadActiveReminders();
+            }
+        }
 
         function adjustTime(unit, delta) {
             if (unit === 'days') {
@@ -131,19 +206,35 @@
 
         function setReminder() {
             const message = document.getElementById('message').value.trim();
+            const messageError = document.getElementById('message-error');
+            
             if (!message) {
-                alert('Please enter a reminder message');
+                messageError.style.display = 'block';
                 return;
             }
-
+            
+            messageError.style.display = 'none';
+            
             const data = {
+                action: 'create_reminder',
                 message: message,
                 days: time.days,
                 hours: time.hours,
                 minutes: time.minutes
             };
+            
             tg.sendData(JSON.stringify(data));
         }
+
+        function loadActiveReminders() {
+            const data = {
+                action: 'get_reminders'
+            };
+            tg.sendData(JSON.stringify(data));
+        }
+
+        // Initialize the app
+        tg.ready();
     </script>
 </body>
 </html> 
