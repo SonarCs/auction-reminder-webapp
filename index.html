@@ -246,8 +246,13 @@
                 minutes: time.minutes
             };
 
+            // Send data and wait for confirmation before closing
             tg.sendData(JSON.stringify(data));
-            tg.close();
+            
+            // Show loading state
+            const setButton = document.querySelector('.set-button');
+            setButton.textContent = 'Setting...';
+            setButton.disabled = true;
         }
 
         function switchTab(tabName) {
@@ -280,16 +285,12 @@
             setTimeout(loadActiveSubscriptions, 500);
         }
 
-        // Listen for MainButton clicks
-        tg.onEvent('mainButtonClicked', setSubscription);
-
-        // Handle incoming data from the bot
-        window.Telegram.WebApp.onEvent('viewportChanged', function() {
-            if (tg.initDataUnsafe?.query_id) {
-                const data = JSON.parse(tg.initDataUnsafe.query_id);
-                if (data.reminders) {
-                    updateSubscriptionsList(data.reminders);
-                }
+        // Remove the viewportChanged event and add proper data handling
+        tg.onEvent('message', function(message) {
+            if (message && message.reminders) {
+                updateSubscriptionsList(message.reminders);
+            } else if (message && message.success) {
+                tg.close();
             }
         });
 
