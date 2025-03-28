@@ -238,6 +238,11 @@
                 return;
             }
 
+            // Show loading state
+            const setButton = document.querySelector('.set-button');
+            setButton.textContent = 'Setting...';
+            setButton.disabled = true;
+
             const data = {
                 action: 'create_reminder',
                 message: name,
@@ -246,15 +251,13 @@
                 minutes: time.minutes
             };
 
-            // Show loading state
-            const setButton = document.querySelector('.set-button');
-            setButton.textContent = 'Setting...';
-            setButton.disabled = true;
-
-            // Send data
-            tg.MainButton.setText('Setting reminder...');
-            tg.MainButton.show();
+            // Send data and close immediately
             tg.sendData(JSON.stringify(data));
+            
+            // Close the web app after a short delay
+            setTimeout(() => {
+                tg.close();
+            }, 500);
         }
 
         function switchTab(tabName) {
@@ -286,30 +289,6 @@
             // Reload the list after deletion
             setTimeout(loadActiveSubscriptions, 500);
         }
-
-        // Update the event handler
-        tg.onEvent('message', function(event) {
-            try {
-                const message = JSON.parse(event.data);
-                console.log('Received message:', message);
-                
-                if (message.reminders) {
-                    updateSubscriptionsList(message.reminders);
-                } else if (message.success) {
-                    // Wait a bit before closing to show success
-                    setTimeout(() => {
-                        tg.close();
-                    }, 1000);
-                } else if (message.error) {
-                    tg.showAlert(message.error);
-                    const setButton = document.querySelector('.set-button');
-                    setButton.textContent = 'Set Timer';
-                    setButton.disabled = false;
-                }
-            } catch (e) {
-                console.error('Error parsing message:', e);
-            }
-        });
 
         function updateSubscriptionsList(reminders) {
             const list = document.getElementById('subscriptions-list');
