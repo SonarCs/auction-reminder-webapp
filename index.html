@@ -18,6 +18,8 @@
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         body {
@@ -26,6 +28,9 @@
             padding: 16px;
             max-width: 400px;
             margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .time-input {
@@ -65,7 +70,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            user-select: none;
+            touch-action: manipulation;
         }
 
         .time-button:active {
@@ -91,6 +96,8 @@
             font-weight: 500;
             cursor: pointer;
             margin-top: 8px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .set-button:active {
@@ -106,6 +113,8 @@
             color: #fff;
             font-size: 16px;
             margin-bottom: 16px;
+            -webkit-user-select: text;
+            user-select: text;
         }
 
         .subscription-input::placeholder {
@@ -114,6 +123,17 @@
 
         .subscription-input:focus {
             outline: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .button-container {
+            margin-top: auto;
+            padding-bottom: 16px;
         }
 
         .subscriptions-list {
@@ -139,36 +159,70 @@
     </style>
 </head>
 <body>
-    <input type="text" class="subscription-input" id="subscription-name" placeholder="Enter subscription name">
-    
-    <div class="time-input">
-        <div class="time-row">
-            <div class="time-label">Days</div>
-            <div class="time-controls">
-                <button class="time-button" onclick="adjustTime('days', -1)">-</button>
-                <div class="time-value" id="days-value">0</div>
-                <button class="time-button" onclick="adjustTime('days', 1)">+</button>
+    <div class="main-content">
+        <input type="text" class="subscription-input" id="subscription-name" placeholder="Enter subscription name">
+        
+        <div class="time-input">
+            <div class="time-row">
+                <div class="time-label">Days</div>
+                <div class="time-controls">
+                    <button class="time-button" 
+                        onmousedown="startDecrease('days')" 
+                        onmouseup="stopAdjust()"
+                        onmouseleave="stopAdjust()"
+                        ontouchstart="startDecrease('days')" 
+                        ontouchend="stopAdjust()">-</button>
+                    <div class="time-value" id="days-value">0</div>
+                    <button class="time-button" 
+                        onmousedown="startIncrease('days')" 
+                        onmouseup="stopAdjust()"
+                        onmouseleave="stopAdjust()"
+                        ontouchstart="startIncrease('days')" 
+                        ontouchend="stopAdjust()">+</button>
+                </div>
             </div>
-        </div>
-        <div class="time-row">
-            <div class="time-label">Hours</div>
-            <div class="time-controls">
-                <button class="time-button" onclick="adjustTime('hours', -1)">-</button>
-                <div class="time-value" id="hours-value">0</div>
-                <button class="time-button" onclick="adjustTime('hours', 1)">+</button>
+            <div class="time-row">
+                <div class="time-label">Hours</div>
+                <div class="time-controls">
+                    <button class="time-button" 
+                        onmousedown="startDecrease('hours')" 
+                        onmouseup="stopAdjust()"
+                        onmouseleave="stopAdjust()"
+                        ontouchstart="startDecrease('hours')" 
+                        ontouchend="stopAdjust()">-</button>
+                    <div class="time-value" id="hours-value">0</div>
+                    <button class="time-button" 
+                        onmousedown="startIncrease('hours')" 
+                        onmouseup="stopAdjust()"
+                        onmouseleave="stopAdjust()"
+                        ontouchstart="startIncrease('hours')" 
+                        ontouchend="stopAdjust()">+</button>
+                </div>
             </div>
-        </div>
-        <div class="time-row">
-            <div class="time-label">Minutes</div>
-            <div class="time-controls">
-                <button class="time-button" onclick="adjustTime('minutes', -1)">-</button>
-                <div class="time-value" id="minutes-value">0</div>
-                <button class="time-button" onclick="adjustTime('minutes', 1)">+</button>
+            <div class="time-row">
+                <div class="time-label">Minutes</div>
+                <div class="time-controls">
+                    <button class="time-button" 
+                        onmousedown="startDecrease('minutes')" 
+                        onmouseup="stopAdjust()"
+                        onmouseleave="stopAdjust()"
+                        ontouchstart="startDecrease('minutes')" 
+                        ontouchend="stopAdjust()">-</button>
+                    <div class="time-value" id="minutes-value">0</div>
+                    <button class="time-button" 
+                        onmousedown="startIncrease('minutes')" 
+                        onmouseup="stopAdjust()"
+                        onmouseleave="stopAdjust()"
+                        ontouchstart="startIncrease('minutes')" 
+                        ontouchend="stopAdjust()">+</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <button class="set-button" onclick="setSubscription()">Set Reminder</button>
+    <div class="button-container">
+        <button class="set-button" onclick="setSubscription()">Set Reminder</button>
+    </div>
 
     <div class="subscriptions-list" id="subscriptions-list">
         <!-- Active subscriptions will be listed here -->
@@ -184,9 +238,39 @@
             minutes: 0
         };
 
+        let adjustInterval = null;
+        let adjustDelay = null;
+
         function adjustTime(unit, delta) {
             time[unit] = Math.max(0, time[unit] + delta);
             document.getElementById(`${unit}-value`).textContent = time[unit];
+        }
+
+        function startIncrease(unit) {
+            adjustTime(unit, 1);
+            // Initial delay before rapid increment
+            adjustDelay = setTimeout(() => {
+                adjustInterval = setInterval(() => adjustTime(unit, 1), 100);
+            }, 500);
+        }
+
+        function startDecrease(unit) {
+            adjustTime(unit, -1);
+            // Initial delay before rapid decrement
+            adjustDelay = setTimeout(() => {
+                adjustInterval = setInterval(() => adjustTime(unit, -1), 100);
+            }, 500);
+        }
+
+        function stopAdjust() {
+            if (adjustInterval) {
+                clearInterval(adjustInterval);
+                adjustInterval = null;
+            }
+            if (adjustDelay) {
+                clearTimeout(adjustDelay);
+                adjustDelay = null;
+            }
         }
 
         function setSubscription() {
@@ -213,6 +297,11 @@
             tg.sendData(JSON.stringify(data));
             tg.close();
         }
+
+        // Prevent scrolling when touching the buttons
+        document.querySelectorAll('.time-button').forEach(button => {
+            button.addEventListener('touchstart', (e) => e.preventDefault());
+        });
 
         // Initialize
         tg.ready();
