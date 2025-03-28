@@ -163,6 +163,12 @@
             color: #8e8e93;
             padding: 32px 16px;
         }
+
+        .subscription-info {
+            color: #8e8e93;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
@@ -251,13 +257,33 @@
                 minutes: time.minutes
             };
 
-            // Send data and close immediately
+            // Send data without closing
             tg.sendData(JSON.stringify(data));
-            
-            // Close the web app after a short delay
+
+            // Reset form after sending
             setTimeout(() => {
-                tg.close();
-            }, 500);
+                document.getElementById('subscription-name').value = '';
+                time.days = 0;
+                time.hours = 0;
+                time.minutes = 0;
+                document.getElementById('days-value').textContent = '0';
+                document.getElementById('hours-value').textContent = '0';
+                document.getElementById('minutes-value').textContent = '0';
+                setButton.textContent = 'Set Timer';
+                setButton.disabled = false;
+                
+                // Show success message
+                tg.showPopup({
+                    title: 'Success',
+                    message: 'Timer set successfully!',
+                    buttons: [{type: 'ok'}]
+                });
+
+                // Refresh active timers if we're on that tab
+                if (document.querySelector('.tab.active').textContent.includes('Active')) {
+                    loadActiveSubscriptions();
+                }
+            }, 1000);
         }
 
         function switchTab(tabName) {
@@ -297,8 +323,15 @@
                 return;
             }
 
+            // Sort reminders by target time
+            const sortedReminders = Object.entries(reminders).sort((a, b) => {
+                const timeA = new Date(a[1].target_time);
+                const timeB = new Date(b[1].target_time);
+                return timeA - timeB;
+            });
+
             list.innerHTML = '';
-            for (const [id, reminder] of Object.entries(reminders)) {
+            for (const [id, reminder] of sortedReminders) {
                 const targetTime = new Date(reminder.target_time);
                 const timeLeft = getTimeLeft(targetTime);
                 
@@ -308,6 +341,9 @@
                     <div class="subscription-header">
                         <div class="subscription-name">${reminder.message}</div>
                         <div class="subscription-time">${timeLeft}</div>
+                    </div>
+                    <div class="subscription-info">
+                        Expires: ${targetTime.toLocaleString()}
                     </div>
                     <div class="subscription-actions">
                         <button class="action-button delete" onclick="deleteSubscription('${id}')">Stop Timer</button>
