@@ -55,10 +55,39 @@
         .set-btn:active {
             background: var(--tg-theme-button-color, #218838);
         }
+        .message-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid var(--tg-theme-hint-color, #ccc);
+            border-radius: 5px;
+            background: var(--tg-theme-bg-color, white);
+            color: var(--tg-theme-text-color, #000);
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .message-input:focus {
+            outline: none;
+            border-color: var(--tg-theme-button-color, #0088cc);
+        }
+        .section-title {
+            color: var(--tg-theme-hint-color, #666);
+            font-size: 14px;
+            margin: 10px 0 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="section-title">Reminder Message</div>
+        <textarea 
+            class="message-input" 
+            id="message" 
+            placeholder="Enter your reminder message here..."
+            rows="3"
+        ></textarea>
+        
+        <div class="section-title">Time Settings</div>
         <div class="time-selector">
             <button class="btn" onclick="adjustTime('days', -1)">-</button>
             <span class="value" id="days">0d</span>
@@ -101,7 +130,14 @@
         }
 
         function setReminder() {
+            const message = document.getElementById('message').value.trim();
+            if (!message) {
+                alert('Please enter a reminder message');
+                return;
+            }
+
             const data = {
+                message: message,
                 days: time.days,
                 hours: time.hours,
                 minutes: time.minutes
